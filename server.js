@@ -8,9 +8,15 @@ app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:false}))
 
-app.get('/add', (req,res)=>{
-    res.send('done')
-})
+
+// var admin = require("firebase-admin");
+
+// var serviceAccount = require("./volunteer-network-fullstack-firebase-adminsdk-q8i4w-73316a9b54.json");
+
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+//   databaseURL: "https://volunteer-network-fullstack.firebaseio.com"
+// });
 
 
 
@@ -19,7 +25,7 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
   const eventsCollection = client.db(`${process.env.DB_NAME}`).collection("events");
-  const registerCollection = client.db(`${process.env.DB_NAME}`).collection("registered");
+  const registeredEvents = client.db(`${process.env.DB_NAME}`).collection("registered");
   //mongo scope start
 
   app.get('/show-volunteers', (req,res)=>{
@@ -27,10 +33,23 @@ client.connect(err => {
     .toArray((error, documents)=>{
       res.send(documents)
     })
-    
   })
 
-    
+    app.post('/submit-form',(req,res)=>{
+      registeredEvents.insertOne(req.body)
+      .then(result=>{
+        console.log(result)
+        res.send(result.insertedCount>0)
+      })
+    })
+
+    app.get('/my-events',(req,res)=>{
+      registeredEvents.find({email:req.headers.email})
+      .toArray((error,documents)=>{
+        res.send(documents)
+        
+      })
+    })
   //mongo scope end
 });
 

@@ -28,10 +28,25 @@ client.connect(err => {
   const registeredEvents = client.db(process.config.DB_NAME).collection("registered");
   //mongo scope start
   app.get('/show-volunteers', (req,res)=>{
-   
     eventsCollection.find({})
     .toArray((error, documents)=>{
       res.send(documents)
+    })
+  })
+
+  app.get('/all-registered-events',(req,res)=>{
+    registeredEvents.find({})
+    .toArray((error,documents)=>{
+      res.send(documents)
+      
+    })
+  })
+
+  app.get('/my-events',(req,res)=>{
+    registeredEvents.find({email:req.headers.email})
+    .toArray((error,documents)=>{
+      res.send(documents)
+      
     })
   })
 
@@ -43,11 +58,10 @@ client.connect(err => {
       })
     })
 
-    app.get('/my-events',(req,res)=>{
-      registeredEvents.find({email:req.headers.email})
-      .toArray((error,documents)=>{
-        res.send(documents)
-        
+    app.post('/add-event',(req,res)=>{
+      eventsCollection.insertOne(req.body)
+      .then(result=>{
+        res.send(result.insertedCount>0)
       })
     })
 
@@ -60,13 +74,7 @@ client.connect(err => {
       })
     })
 
-    app.get('/all-registered-events',(req,res)=>{
-      registeredEvents.find({})
-      .toArray((error,documents)=>{
-        res.send(documents)
-        
-      })
-    })
+
   //mongo scope end
 });
 

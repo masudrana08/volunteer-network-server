@@ -51,8 +51,8 @@ client.connect(err => {
       })
     })
 
+
     app.delete('/cancel-event',(req,res)=>{
-      console.log(req.headers.id)
       registeredEvents.deleteOne({_id:ObjectID(req.headers.id)})
       .then(result=>{
         
@@ -60,6 +60,13 @@ client.connect(err => {
       })
     })
 
+    app.get('/all-registered-events',(req,res)=>{
+      registeredEvents.find({})
+      .toArray((error,documents)=>{
+        res.send(documents)
+        
+      })
+    })
   //mongo scope end
 });
 

@@ -74,6 +74,14 @@ client.connect(err => {
       })
     })
 
+    app.delete('/delete-event',(req,res)=>{
+      registeredEvents.deleteOne({_id:ObjectID(req.headers.id)})
+      .then(result=>{
+        
+        res.send(result.deletedCount>0)
+      })
+    })
+
 
   //mongo scope end
 });
